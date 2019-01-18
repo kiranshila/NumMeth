@@ -1,7 +1,6 @@
 # Week 2 NumMeth/PDE Work
-using StatsBase
-using Distributions
-using BenchmarkTools
+using Distributions, Random, StatsBase, BenchmarkTools
+
 # Assuming this script is run in the project folder
 # Parse data into data array
 file = open("data1.txt")
@@ -22,5 +21,8 @@ end
 # Find stats for dat
 @benchmark stats = estimate_gaussian_params(dat)
 
-function check_params(stats::Dict,data)
-  
+function check_params(mean::Number=0,std_dev::Number=1,length::Int64=200)
+  # Generate random data
+  dat = rand(Normal(mean, std_dev), length)
+  stats = estimate_gaussian_params(dat)
+end
