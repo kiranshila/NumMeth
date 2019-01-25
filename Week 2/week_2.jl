@@ -3,7 +3,7 @@ using Distributions, Random, StatsBase
 
 # Assuming this script is run in the project folder
 # Parse data into data array
-file = open("data5.txt")
+file = open("data4.txt")
 dat = [parse(Float64,l) for l in eachline(file)]
 
 """
@@ -44,15 +44,15 @@ check_params()
 # Check params using custom arguments
 check_params(34,2,1000)
 
-function epanechnikov(z::Number)
+function epanechnikov(t::Number,h::Number)
   if abs(t) < h
-    return 1/(2*h)
+    return 0.75 * (1 - (t/h)^2) / h
   else
     return 0
   end
 end
 
-function gauss(t::Number,h::Number)
+function gaussian(t::Number,h::Number)
   return 1/(sqrt(pi*2)*h) * exp(-t^2/(2*h^2))
 end
 
@@ -66,7 +66,7 @@ end
 
 
 function kernel_density_estimator(data::Vector,bw::Number,numPoints::Int64=200,kernel::Function=rectangular)
-  return [(1/numPoints) * sum([kernel(x-xi,bw) for xi in data]) for x = range(minimum(data),
+  return [(1/length(data)) * sum([kernel(x-xi,bw) for xi in data]) for x = range(minimum(data),
                                                                        stop=maximum(data),
                                                                        length=numPoints)]
 end
