@@ -1,5 +1,8 @@
+using LinearAlgebra
+
 function gauss_elim(A::Matrix,b::Vector)
     # Create augmented matrix
+    # make sure its a float otherwise we get float errors
     A_Aug = float([A b])
     # For every column except the last one because we augmented
     for k = 1:size(A_Aug)[2]-1
@@ -20,6 +23,12 @@ function gauss_elim(A::Matrix,b::Vector)
             A_Aug[i,:] -= A_Aug[k,:]
         end
     end
+    # Now back substitute to get to x
+    x = zeros(size(b)) # Create zeros for solution vector
+    for i in size(b)[1]:-1:1 # For every row, working backwards
+        x[i] = (b[i] - sum([a[i,j] * x[j] for j = i+1:size(b)[1]])) / A[i,i]
+    end
+
     # Return solution vector x and U
-    return A_Aug[:,end], A_Aug[:,1:end-1]
+    return x, A_Aug[:,1:end-1]
 end
