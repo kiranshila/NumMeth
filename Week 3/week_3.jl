@@ -76,21 +76,24 @@ function my_lu(A::Matrix)
                 temp = A_Copy[location,j]
                 A_Copy[location,j] = A_Copy[k,j]
                 A_Copy[k,j] = temp
-                # And swap in P matrix
-                temp = P[location,j]
-                P[location,j] = P[k,j]
-                P[k,j] = temp
             end
+            # And swap in P
+            P[location,:] , P[k,:] = P[k,:] , P[location,:]
+            # And swap columns in L
+            L[:,location] , L[:,k] = L[:,k] , L[:,location]
         end
+
         # Now perform gaussian elimination
         # For every row under the pivot
         for i = k+1:n
             # Normalize to the pivot and subtract from pivot row
             if A_Copy[i,k] != 0 # Ensures that we need to perform elimination
-                scale = A_Copy[k,k] / A_Copy[i,k]
-                for j in k:size(A_Copy)[2] # Start at this column to the end including augmentation
-                    A_Copy[i,j] = A_Copy[i,j] * scale
-                    A_Copy[i,j] = A_Copy[i,j] - A_Copy[k,j]
+                scale =  A_Copy[i,k] / A_Copy[k,k]
+                thisL = float(one(A))
+                thisL[i,k] = scale
+                L = L * thisL
+                for j in k:size(A_Copy)[2]
+                    A_Copy[i,j] = A_Copy[i,j] - scale * A_Copy[k,j]
                     if abs(A_Copy[i,j]) < eps()
                         A_Copy[i,j] = 0 # For stability against epsilon
                     end
@@ -99,27 +102,13 @@ function my_lu(A::Matrix)
         end
     end
     # Return solution vector L and U
-    return L,A_Copy,P
+    return P*L,A_Copy,P
 end
 
 L,U,P = my_lu(A)
 
+A = [1 2 1;3 8 1;0 4 1]
 
-
-
-L*U
-
-
-
-
-P*A
-
-
-
-
-A
-
-
-
+L,U,P = my_lu(A)
 
 L,U = lu(A)
